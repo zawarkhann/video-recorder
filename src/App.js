@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState,useEffect } from "react";
 
 const App = () => {
   const videoRef = useRef(null);
@@ -7,6 +7,7 @@ const App = () => {
   const [recordedVideo, setRecordedVideo] = useState(null);
   const [stream, setStream] = useState(null);
   const [showRecorder, setShowRecorder] = useState(false);
+  const [details, setdetails] = useState([]);
 
   const startRecording = async () => {
     setShowRecorder(true);
@@ -65,9 +66,40 @@ const App = () => {
     }
   };
   
- 
+  useEffect(() => {
+    console.log(details);
+  }, [details]);
 
 
+  // const uploadToDrive = async () => {
+  //   if (recordedVideo) {
+  //     const blob = await fetch(recordedVideo).then(r => r.blob());
+  //     const formData = new FormData();
+  //     formData.append("file", blob, "recorded-video.mp4");
+
+  //     try {
+  //       const response = await fetch("https://latest-mapper-2o69ujbm5-zawarkhanns-projects.vercel.app/api/v1/upload", {
+  //         method: "POST",
+  //         body: formData,
+  //       });
+    
+  //       const result = await response.json(); // Parse JSON response
+  //       if (result.data && result.data.downloadLink) {
+  //         console.log(result.data);  // Log the result first
+  //         setdetails([result.data]);
+  //         // console.log(details)
+  //         window.location.href = result.data.downloadLink;  // Then redirect
+          
+  //       } else {
+  //         alert("Download link not found. Response: " + JSON.stringify(result));
+  //       }
+  //     } catch (error) {
+  //       console.error("Error during upload:", error);
+  //       alert("An error occurred during the upload.");
+  //     }
+    
+  //   }
+  // };
   const uploadToDrive = async () => {
     if (recordedVideo) {
       const blob = await fetch(recordedVideo).then(r => r.blob());
@@ -82,7 +114,11 @@ const App = () => {
     
         const result = await response.json(); // Parse JSON response
         if (result.data && result.data.downloadLink) {
-          window.location.href = result.data.downloadLink;
+          console.log(result.data);  // Log the result first
+          setdetails([result.data]);
+          // console.log(details)
+          // window.location.href = result.data.downloadLink;  // Then redirect
+          
         } else {
           alert("Download link not found. Response: " + JSON.stringify(result));
         }
@@ -112,6 +148,18 @@ const App = () => {
           <div className="mt-2">
             <button onClick={startRecording} className="px-4 py-2 bg-yellow-500 text-white rounded-lg mr-2">Record Again</button>
             <button onClick={uploadToDrive} className="px-4 py-2 bg-blue-500 text-white rounded-lg">Submit Video</button>
+            <div className="bg-orange-500">
+            {details.map((item, index) => (
+  <div key={index}>
+    <p><strong>Name:</strong> {item.name}</p>
+    <p><strong>ID:</strong> {item.id}</p>
+    <p><strong>Latitude:</strong> {item.latitude}</p>
+    <p><strong>Longitude:</strong> {item.longitude}</p>
+    <p><strong>View Link:</strong> <a href={item.viewLink} target="_blank" rel="noopener noreferrer">View</a></p>
+    <p><strong>Download Link:</strong> <a href={item.downloadLink} target="_blank" rel="noopener noreferrer">Download</a></p>
+  </div>
+))}
+  </div>
           </div>
         </div>
       )}
